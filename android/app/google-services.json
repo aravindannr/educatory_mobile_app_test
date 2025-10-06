@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "86965198007",
+    "project_id": "educatory-d2022",
+    "storage_bucket": "educatory-d2022.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:86965198007:android:a66cff2893671b86704132",
+        "android_client_info": {
+          "package_name": "com.example.educatory_mobile_application"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "86965198007-slplph6moktukv690fs7r5me9k2mguup.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.educatory_mobile_application",
+            "certificate_hash": "af3b34f3a3261c9b1c881bfd9cf4ff8e9f6b4bd9"
+          }
+        },
+        {
+          "client_id": "86965198007-fq4satrcnlll7io79h2g2tfrnjnqdop4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXCfvwcIfSrvF-npoPOFDh9hxVCwPu9pA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "86965198007-fq4satrcnlll7io79h2g2tfrnjnqdop4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

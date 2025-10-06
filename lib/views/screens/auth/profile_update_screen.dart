@@ -163,43 +163,38 @@ class _ProfileUpdateScreenState extends State<ProfileUpdateScreen> {
                 ),
               SizedBox(height: 20),
               CustomButton(
-                onPressed: widget.isFromSignIn
-                    ? () async {
-                        AppRoutes.navigateTo(context, AppRoutes.profileSuccess);
-                      }
-                    : () async {
-                        final profileProvider = Provider.of<ProfileProvider>(
-                          context,
-                          listen: false,
-                        );
+                onPressed: () async {
+                  final profileProvider = Provider.of<ProfileProvider>(
+                    context,
+                    listen: false,
+                  );
 
-                        final imageUrl =
-                            profileProvider.uploadedImageUrl?.isNotEmpty == true
-                            ? profileProvider.uploadedImageUrl!
-                            : userAvatar;
+                  final imageUrl =
+                      profileProvider.uploadedImageUrl?.isNotEmpty == true
+                      ? profileProvider.uploadedImageUrl!
+                      : userAvatar;
 
-                        try {
-                          final response = await ApiServices().createUser(
-                            userName,
-                            userEmail,
-                            userPhone,
-                            imageUrl,
-                          );
-                          if (response.message == 'User created successfully') {
-                            AppRoutes.navigateTo(
-                              context,
-                              AppRoutes.profileSuccess,
-                            );
-                          } else {
-                            Helpers.showSnackBar(
-                              context,
-                              response.message ?? "Failed to create user",
-                            );
-                          }
-                        } catch (e) {
-                          Helpers.showSnackBar(context, "Error: $e");
-                        }
-                      },
+                  try {
+                    final response = await ApiServices().createUser(
+                      userName,
+                      userEmail,
+                      userPhone,
+                      imageUrl,
+                    );
+                    final message = response.message ?? response.error ?? '';
+
+                    if (message.toLowerCase().contains(
+                          "user created successfully",
+                        ) ||
+                        message.toLowerCase().contains("user already exists")) {
+                      AppRoutes.navigateTo(context, AppRoutes.profileSuccess);
+                    } else {
+                      Helpers.showSnackBar(context, message);
+                    }
+                  } catch (e) {
+                    Helpers.showSnackBar(context, "Error: $e");
+                  }
+                },
                 buttonActionText: "Continue",
               ),
             ],

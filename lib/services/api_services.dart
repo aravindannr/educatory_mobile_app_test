@@ -276,12 +276,9 @@ class ApiServices {
           "picture": imageUrl,
         }),
       );
-      if (response.statusCode == 200) {
-        return createUserModelFromJson(response.body);
-      } else {
-        Helpers.print('Server error: ${response.body}');
-        throw Exception("Failed to create-user: ${response.body}");
-      }
+      final result = createUserModelFromJson(response.body);
+      Helpers.print('Server response: ${response.body}');
+      return result;
     } catch (e) {
       Helpers.print('Exception while create-user: $e');
       rethrow;

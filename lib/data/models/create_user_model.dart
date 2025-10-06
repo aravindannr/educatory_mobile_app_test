@@ -12,6 +12,7 @@ String createUserModelToJson(CreateUserModel data) =>
 
 class CreateUserModel {
   String? message;
+  String? error;
   int? userId;
   String? fullname;
   String? email;
@@ -20,6 +21,7 @@ class CreateUserModel {
 
   CreateUserModel({
     this.message,
+    this.error,
     this.userId,
     this.fullname,
     this.email,
@@ -30,6 +32,7 @@ class CreateUserModel {
   factory CreateUserModel.fromJson(Map<String, dynamic> json) =>
       CreateUserModel(
         message: json["message"],
+        error: json["error"],
         userId: json["userId"],
         fullname: json["fullname"],
         email: json["email"],
@@ -39,6 +42,7 @@ class CreateUserModel {
 
   Map<String, dynamic> toJson() => {
     "message": message,
+    "error": error,
     "userId": userId,
     "fullname": fullname,
     "email": email,

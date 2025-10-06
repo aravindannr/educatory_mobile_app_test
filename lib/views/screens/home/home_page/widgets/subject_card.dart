@@ -26,9 +26,9 @@ class SubjectCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image.network(
-            icon,
-            width: 40,
-            height: 40,
+            "$icon.png",
+            width: 30,
+            height: 30,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) {
               return Container(

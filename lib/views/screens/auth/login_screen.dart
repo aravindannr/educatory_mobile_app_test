@@ -171,6 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 'isFromSignIn': true,
                               },
                             );
+                            value.clearEmail();
                           } else {
                             Helpers.showSnackBar(
                               context,

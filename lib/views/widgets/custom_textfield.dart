@@ -8,11 +8,13 @@ class CustomTextfield extends StatelessWidget {
     required this.hintText,
     this.prefixIcon,
     this.controller,
+    this.readOnly,
   });
   final String fieldHeading;
   final String hintText;
   final Icon? prefixIcon;
   final TextEditingController? controller;
+  final bool? readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +27,7 @@ class CustomTextfield extends StatelessWidget {
         ),
         SizedBox(height: 5),
         TextField(
+          readOnly: readOnly ?? false,
           controller: controller,
           decoration: InputDecoration(
             prefixIcon: prefixIcon,

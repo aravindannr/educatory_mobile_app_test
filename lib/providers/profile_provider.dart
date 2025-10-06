@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ProfileProvider extends ChangeNotifier {
   File? selectedImage;
   bool isUploading = false;
+  String? uploadedImageUrl;
 
   Future<void> pickAndUploadImage(BuildContext context) async {
     try {
@@ -26,10 +27,15 @@ class ProfileProvider extends ChangeNotifier {
         isUploading = true;
         notifyListeners();
 
-        await ApiServices().uploadProfilePicture(
+        final imageResponse = await ApiServices().uploadProfilePicture(
           token: token,
           imageFile: selectedImage!,
         );
+        final imageUrl = imageResponse?.picture ?? '';
+        uploadedImageUrl = imageUrl;
+        await prefs.setString("userImageUrl", imageUrl);
+
+        Helpers.print("Profile image uploaded successfully: $imageUrl");
 
         isUploading = false;
         notifyListeners();

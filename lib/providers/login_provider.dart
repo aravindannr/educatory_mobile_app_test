@@ -15,6 +15,13 @@ class LoginProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clearEmail() {
+    if (emailController.text.isNotEmpty) {
+      emailController.clear();
+      notifyListeners();
+    }
+  }
+
   Future<UserCredential?> signInWithGoogle() async {
     isGoogleSignInLoading = true;
     notifyListeners();

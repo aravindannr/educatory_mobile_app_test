@@ -51,11 +51,12 @@ class _LoginScreenState extends State<LoginScreen> {
         if (otpResponse.message == "OTP sent to email successfully.") {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString("userEmail", email);
+          await prefs.setString("userFullName", user?.displayName ?? '');
 
           AppRoutes.navigateTo(
             context,
             AppRoutes.otp,
-            arguments: {'email': email},
+            arguments: {'email': email, 'isFromSignIn': true},
           );
         } else {
           Helpers.showSnackBar(
@@ -165,7 +166,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             AppRoutes.navigateTo(
                               context,
                               AppRoutes.otp,
-                              arguments: {'email': value.emailController.text},
+                              arguments: {
+                                'email': value.emailController.text,
+                                'isFromSignIn': true,
+                              },
                             );
                           } else {
                             Helpers.showSnackBar(
@@ -203,6 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
+                                value.clearEmail();
                                 AppRoutes.navigateTo(context, AppRoutes.signUp);
                               },
                           ),

@@ -50,7 +50,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
         if (otpResponse.message == "OTP sent to email successfully.") {
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setString("userEmail", email);
+          await prefs.setString("signUpEmail", email);
 
           AppRoutes.navigateTo(
             context,
@@ -163,14 +163,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             SharedPreferences prefs =
                                 await SharedPreferences.getInstance();
                             prefs.setString(
-                              "userEmail",
+                              "signUpEmail",
                               value.emailController.text,
                             );
                             AppRoutes.navigateTo(
                               context,
                               AppRoutes.otp,
-                              arguments: {'email': value.emailController.text},
+                              arguments: {
+                                'email': value.emailController.text,
+                                'isFromSignIn': false,
+                              },
                             );
+                            value.clearTextfield();
                           } else {
                             Helpers.showSnackBar(
                               context,
@@ -207,6 +211,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
+                                value.clearTextfield();
                                 AppRoutes.navigateTo(context, AppRoutes.signIn);
                               },
                           ),

@@ -83,6 +83,9 @@ class _FullNameScreenState extends State<FullNameScreen> {
                       fullName,
                       token,
                     );
+                    setState(() {
+                      nameController.clear();
+                    });
                     if (response.message != "Fullname added successfully.") {
                       Helpers.showSnackBar(
                         context,
@@ -90,7 +93,7 @@ class _FullNameScreenState extends State<FullNameScreen> {
                       );
                     } else {
                       AppRoutes.navigateTo(
-                        arguments: {'isFromSignIn': true},
+                        arguments: {'isFromSignIn': false},
                         context,
                         AppRoutes.profileUpdate,
                       );

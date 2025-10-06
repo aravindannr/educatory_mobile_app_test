@@ -36,8 +36,12 @@ class AppRoutes {
 
       case otp:
         final args = settings.arguments as Map<String, dynamic>?;
+        final isFromSignIn = args?['isFromSignIn'] as bool? ?? false;
         return MaterialPageRoute(
-          builder: (_) => OtpScreen(email: args?['email'] ?? ''),
+          builder: (_) => OtpScreen(
+            email: args?['email'] ?? '',
+            isFromSignIn: isFromSignIn,
+          ),
         );
 
       case fullName:

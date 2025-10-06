@@ -24,6 +24,11 @@ class SignUpProvider extends ChangeNotifier {
     }
   }
 
+  void clearTextfield() {
+    emailController.clear();
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     emailController.dispose();

@@ -21,28 +21,42 @@ class ProfileUpdateScreen extends StatefulWidget {
 
 class _ProfileUpdateScreenState extends State<ProfileUpdateScreen> {
   TextEditingController fullNameController = TextEditingController();
-  String? userEmail;
-  String? phoneNumber;
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _fetchProfileData();
   }
 
-  Future<void> _loadUserData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? savedName = prefs.getString("fullName");
-    String? savedEmail = prefs.getString("userEmail");
-    int? savedPhone = prefs.getInt("userPhoneNumber");
+  String userName = '';
+  String userEmail = '';
+  String userPhone = '';
+  String userAvatar = '';
 
-    setState(() {
-      if (savedName != null && savedName.isNotEmpty) {
-        fullNameController.text = savedName;
+  Future<void> _fetchProfileData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      if (token == null) throw Exception('No token found');
+
+      final response = await ApiServices().fetchProfile(token: token);
+
+      setState(() {
+        userName = response.user?.fullname ?? 'Unknown';
+        userEmail = response.user?.email ?? 'No email';
+        userPhone = response.user?.phone?.toString() ?? 'No phone';
+        userAvatar =
+            response.user?.picture ??
+            'https://ui-avatars.com/api/?name=${Uri.encodeComponent(userName)}&size=200&background=7C3AED&color=fff';
+        fullNameController.text = userName;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error loading profile: $e')));
       }
-      userEmail = savedEmail ?? "No email found";
-      phoneNumber = savedPhone?.toString() ?? "No number found";
-    });
+    }
   }
 
   @override
@@ -125,54 +139,67 @@ class _ProfileUpdateScreenState extends State<ProfileUpdateScreen> {
               ),
               SizedBox(height: 10),
               CustomTextfield(
+                readOnly: widget.isFromSignIn,
                 fieldHeading: "Full Name",
-                hintText: "hintText",
+                hintText: "FullName",
                 controller: fullNameController,
               ),
               SizedBox(height: 10),
               CustomDropdownField(
                 fieldHeading: "Mail Id",
-                hintText: userEmail ?? "Loading...",
-                items: [if (userEmail != null) userEmail!],
+                hintText: userEmail,
+                items: [userEmail],
+                value: userEmail,
                 onChanged: (value) {},
               ),
               SizedBox(height: 20),
               if (widget.isFromSignIn)
                 CustomDropdownField(
                   fieldHeading: "Phone Number",
-                  hintText: "hintText",
-                  items: ["+919066110000"],
+                  hintText: userPhone,
+                  items: [userPhone],
+                  value: userPhone,
                   onChanged: (value) {},
                 ),
               SizedBox(height: 20),
               CustomButton(
-                onPressed: () async {
-                  final prefs = await SharedPreferences.getInstance();
-                  final fullName = prefs.getString("userFullName") ?? '';
-                  final fullNameFromFullNamePage =
-                      prefs.getString("fullName") ?? '';
-                  final email = prefs.getString("userEmail") ?? '';
-                  final phoneNumber = prefs.getString("userPhoneNumber") ?? '';
-                  final imageUrl = prefs.getString("userImageUrl") ?? '';
-                  try {
-                    final response = await ApiServices().createUser(
-                      widget.isFromSignIn ? fullName : fullNameFromFullNamePage,
-                      email,
-                      phoneNumber,
-                      imageUrl,
-                    );
-                    if (response.email != null) {
-                      AppRoutes.navigateTo(context, AppRoutes.profileSuccess);
-                    } else {
-                      Helpers.showSnackBar(
-                        context,
-                        response.message ?? "Failed to create user",
-                      );
-                    }
-                  } catch (e) {
-                    Helpers.showSnackBar(context, "Error: $e");
-                  }
-                },
+                onPressed: widget.isFromSignIn
+                    ? () async {
+                        AppRoutes.navigateTo(context, AppRoutes.profileSuccess);
+                      }
+                    : () async {
+                        final profileProvider = Provider.of<ProfileProvider>(
+                          context,
+                          listen: false,
+                        );
+
+                        final imageUrl =
+                            profileProvider.uploadedImageUrl?.isNotEmpty == true
+                            ? profileProvider.uploadedImageUrl!
+                            : userAvatar;
+
+                        try {
+                          final response = await ApiServices().createUser(
+                            userName,
+                            userEmail,
+                            userPhone,
+                            imageUrl,
+                          );
+                          if (response.message == 'User created successfully') {
+                            AppRoutes.navigateTo(
+                              context,
+                              AppRoutes.profileSuccess,
+                            );
+                          } else {
+                            Helpers.showSnackBar(
+                              context,
+                              response.message ?? "Failed to create user",
+                            );
+                          }
+                        } catch (e) {
+                          Helpers.showSnackBar(context, "Error: $e");
+                        }
+                      },
                 buttonActionText: "Continue",
               ),
             ],

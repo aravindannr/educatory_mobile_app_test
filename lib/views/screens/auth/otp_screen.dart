@@ -1,4 +1,5 @@
 import 'package:educatory_mobile_application/core/constants/app_routes.dart';
+import 'package:educatory_mobile_application/core/utils/helpers.dart';
 import 'package:educatory_mobile_application/providers/otp_page_provider.dart';
 import 'package:educatory_mobile_application/services/api_services.dart';
 import 'package:educatory_mobile_application/views/widgets/custom_button.dart';
@@ -11,8 +12,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class OtpScreen extends StatefulWidget {
   final String email;
+  final bool isFromSignIn;
 
-  const OtpScreen({super.key, required this.email});
+  const OtpScreen({super.key, required this.email, required this.isFromSignIn});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -169,27 +171,53 @@ class _OtpScreenState extends State<OtpScreen> {
                   SizedBox(height: 15),
                   CustomButton(
                     onPressed: () async {
-                      String otp = value.otpControllers
-                          .map((controller) => controller.text)
-                          .join();
-                      final response = await ApiServices().verifyOtp(
-                        widget.email,
-                        otp,
-                      );
-                      if (response.userId != null) {
-                        SharedPreferences preferences =
-                            await SharedPreferences.getInstance();
-                        final token = response.token;
-                        final userId = response.userId;
-                        if (token != null) {
-                          preferences.setString("token", token);
+                      try {
+                        String otp = value.otpControllers
+                            .map((controller) => controller.text)
+                            .join();
+
+                        final response = await ApiServices().verifyOtp(
+                          widget.email,
+                          otp,
+                        );
+
+                        if (response.message == "OTP verified successfully.") {
+                          final prefs = await SharedPreferences.getInstance();
+                          if (response.token != null) {
+                            prefs.setString("token", response.token!);
+                          }
+                          if (response.userId != null) {
+                            prefs.setInt("userId", response.userId!);
+                          }
+
+                          widget.isFromSignIn
+                              ? AppRoutes.navigateTo(
+                                  context,
+                                  AppRoutes.profileUpdate,
+                                  arguments: {'isFromSignIn': true},
+                                )
+                              : AppRoutes.navigateTo(
+                                  context,
+                                  AppRoutes.fullName,
+                                );
+
+                          value.clearOtp();
+                        } else {
+                          Helpers.showSnackBar(context, response.message ?? '');
                         }
-                        if (userId != null) {
-                          preferences.setInt("userId", userId);
+                      } catch (e) {
+                        String errorMsg = e.toString();
+                        if (errorMsg.contains("{\"error\":")) {
+                          final start = errorMsg.indexOf("{\"error\":");
+                          errorMsg = errorMsg.substring(start);
+                          errorMsg = errorMsg
+                              .replaceAll(RegExp(r'[\{\}"error:]'), '')
+                              .trim();
                         }
-                        AppRoutes.navigateTo(context, AppRoutes.fullName);
+                        Helpers.showSnackBar(context, errorMsg);
                       }
                     },
+
                     buttonActionText: "Continue",
                   ),
                   SizedBox(height: 20),
